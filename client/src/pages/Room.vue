@@ -1,10 +1,10 @@
 <template>
   <div v-if="!loading" class="room">
     <div class="room-view__wrapper" v-if="hosting">
-      <RoomHostView />
+      <RoomHost />
     </div>
     <div class="room-view__wrapper" v-else-if="created">
-      <RoomPlayerView />
+      <RoomPlayer />
     </div>
     <div v-else>
       <div class="text--title">
@@ -21,13 +21,13 @@
 import axios from 'axios';
 import { mapState } from 'vuex';
 
-import RoomHostView from '@/components/RoomHostView';
-import RoomPlayerView from '@/components/RoomPlayerView';
+import RoomHost from '@/views/RoomHost';
+import RoomPlayer from '@/views/RoomPlayer';
 
 export default {
   name: 'RoomPage',
   components: {
-    RoomHostView, RoomPlayerView
+    RoomHost, RoomPlayer
   },
 
   data() {
@@ -38,7 +38,13 @@ export default {
   },
   
   computed: {
-    ...mapState(['baseURL', 'loading', 'room', 'socket'])
+    ...mapState([
+      'baseURL', 
+      'loading', 
+      'room', 
+      'player',
+      'socket'
+    ])
   },
 
   methods: {
@@ -75,8 +81,21 @@ export default {
     this.$store.dispatch('connectToSocket');
     this.$store.commit('setLoading', true);
 
+    const { baseURL } = this;
     const { roomId } = this.$route.params;
-    await this.createNewRoom();
+
+    if (!roomId) {
+      await this.createNewRoom();
+    } else {
+      const room = await axios.get(`${baseURL}/room/get/${roomId}`)
+        .then((r) => r.data.room)
+        .catch(console.error);
+
+      if (this.$store.state.player) {
+        this.created = true;
+        this.$store.commit('setRoom', room);
+      }
+    }
 
     this.$store.commit('setLoading', false);
   }

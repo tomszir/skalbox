@@ -21,8 +21,10 @@
     <div class="host-view__content">
       <!-- List of all connected players. -->
 
-      <div class="text--title">
-        {{ $store.state.room.players.length }} <span class="text--subtitle">connected players</span>
+      <div class="host-view__players">
+        <div class="text--title">
+          {{ totalOnlinePlayers }} <span class="text--subtitle">connected players</span>
+        </div>
       </div>
 
       <PlayerList ref="playerList" />
@@ -39,12 +41,25 @@
 </template>
 
 <script>
-import Button from './Button';
-import PlayerList from './PlayerList';
+import { mapState } from 'vuex';
+
+import Button from '@/components/forms/Button';
+import PlayerList from '@/components/PlayerList';
 
 export default {
   name: 'RoomLobbyView',
   components: { Button, PlayerList },
+  computed: {
+    ...mapState([
+      'room',
+      'socket'
+    ]),
+
+    totalOnlinePlayers() {
+      const { room } = this;
+      return room.players.length;
+    }
+  },
   data () {
     return {
       url: 'skalbox.tozv.xyz',
@@ -74,31 +89,32 @@ export default {
 .host-view__header {
   width: 100%;
   flex-shrink: 1;
+
   padding: 20px 0;
-  border-bottom: 1px solid #222;
   margin-bottom: 10px;
+  
+  border-bottom: 1px solid #222;
+  
   text-align: center;
 }
 
 .host-view__content {
-  margin: 0 auto;
-  width: 100%;
-  flex-wrap: wrap;
   display: flex;
   flex: 1 0 auto;
+  flex-wrap: wrap;
   flex-direction: column;
   justify-content: center;
 
-  & > .player-list {
-    flex: 1 0 auto;
-  }
+  width: 100%;
 
-  & > .text--title {
-    text-align: center;
-    flex: 0 1 auto;
-    border-bottom: 1px solid #222;
-    padding-bottom: 15px;
-  }
+  margin: 0 auto;
+}
+
+.host-view__players {
+  text-align: center;
+  flex: 0 1 auto;
+  border-bottom: 1px solid #222;
+  padding-bottom: 15px;
 }
 
 .host-view__footer {

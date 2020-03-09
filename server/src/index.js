@@ -23,14 +23,17 @@ app.use((_, res, next) => {
 
 app.get('/room/get/:roomId', (req, res) => {
   const { roomId } = req.params;
+  const room = rooms.get(roomId);
 
-  if (!rooms.hasOwnProperty(roomId)) {
+  if (!rooms.get(roomId)) {
     return res.status(404).send({
       message: 'Room not found!'
     });
   }
 
-  res.status(200).send({ room });
+  console.log(room.toJSON());
+
+  res.status(200).send({ room: room.toJSON() });
 })
 
 app.post('/room/create', (req, res) => {
@@ -39,11 +42,15 @@ app.post('/room/create', (req, res) => {
     maxPlayers
   });
 
-  if (rooms.has(room)) {
+  /*
+  if (rooms.get(roomId)) {
     return res.status(400).send({
       message: 'A room with the same id already exists!'
     });
   }
+  */
+
+  console.log('Created room!', room.toJSON());
 
   rooms.add(room);
   res.status(200).send({

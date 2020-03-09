@@ -1,15 +1,16 @@
 const Room = require('./Room');
 
-class RoomList {
+class RoomStore {
   constructor() {
     this.rooms = {};
   }
 
   get(id) {
-    if (this.has(id)) {
-      return this.rooms[id];
-    }
-    return null;
+    return this.rooms[id];
+  }
+
+  has(id) {
+    // ...
   }
 
   add(room) {
@@ -20,13 +21,9 @@ class RoomList {
     delete this.rooms[room.id];
   }
 
-  has(id) {
-    return this.rooms[id];
-  }
-
   get length() {
     return Object.keys(this.rooms).length;
   }
 }
 
-module.exports = RoomList;
+module.exports = RoomStore;

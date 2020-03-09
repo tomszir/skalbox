@@ -5,11 +5,16 @@ class Player extends SocketObject {
     super(io);
 
     this.id = socket.id;
+    this.socket = socket;
     this.username = options.username || 'Undefined';
   }
 
-  getSocket() {
-    return super.getSocket(this.id);
+  toJSON() {
+    const { id, username } = this;
+
+    return Object.assign({}, {
+      id, username
+    });
   }
 }
 

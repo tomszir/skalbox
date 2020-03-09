@@ -1,6 +1,6 @@
 <template>
   <div class="button">
-    <button>
+    <button @click="onClick">
       <slot></slot>
     </button>
   </div>
@@ -8,7 +8,12 @@
 
 <script>
 export default {
-  name: 'Button'
+  name: 'Button',
+  methods: {
+    onClick(e) {
+      this.$emit('click', e);
+    }
+  }
 }
 </script>
 

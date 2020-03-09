@@ -11,12 +11,16 @@ export default new Vuex.Store({
 
     socket: null,
 
+    player: null,
+
     room: null,
 
     loading: false
   },
 
-  getters: {},
+  getters: {
+
+  },
 
   mutations: {
     setLoading(state, loading) {
@@ -25,6 +29,10 @@ export default new Vuex.Store({
 
     setRoom(state, room) {
       state.room = room;
+    },
+
+    setPlayer(state, player) {
+      state.player = player;
     },
 
     setSocket(state, socket) {
@@ -41,7 +49,11 @@ export default new Vuex.Store({
       });
 
       socket.on('room/client/updatePlayerList', (players) => {
-        commit('setRoom', Object.assign(state.room, players));
+        const room = Object.assign({}, state.room, players);
+
+        console.log('Received list update: ', room);
+
+        commit('setRoom', room);
       });
 
       commit('setSocket', socket);

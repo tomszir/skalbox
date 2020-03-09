@@ -7,29 +7,31 @@ module.exports = (io, rooms) => {
     log(`Connected!`);
 
     socket.on('room/join', ({ roomId, username }) => {
-      if (!rooms.has(roomId)) {
+      if (!rooms.get(roomId)) {
         log('Connected to a non-existing room.');
         return;
       }
-
+   
       const room = rooms.get(roomId);
       const player = new Player(io, socket, {
         username
       });
 
       room.addPlayer(player);
-      room.updatePlayerList();
+      // room.updatePlayerList();
 
       log(`Connected to room ${roomId}`, player);
     });
 
-    socket.on('room/joinAsHost', ({ roomId }) => {
-      if (!rooms.has(roomId)) {
+    socket.on('room/joinAsHost', (roomId) => {
+      if (!rooms.get(roomId)) {
         log('Connected to a non-existing room.');
         return;
       }
 
-      room.setHost(socket.id);
+      const room = rooms.get(roomId);
+      
+      room.setHost(socket);
 
       log(`The host connected to room ${roomId}`);
     });

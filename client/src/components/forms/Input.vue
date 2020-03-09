@@ -43,6 +43,8 @@ export default {
   },
   methods: {
     onInput(e) {
+      // TODO: Refactor.
+      
       const { maxLength } = this;
       
       if (maxLength > 0 && e.target.value.length > maxLength) {

@@ -33,16 +33,12 @@ class Room extends SocketObject {
   }
 
   setHost(socket) {
-    this.host = socket.id;
-  }
-
-  getHost() {
-    return this.getSocket(this.host);
+    this.host = socket;
   }
 
   // Adds a player to this room.
   addPlayer(player) {
-    player.getSocket().join(this.roomName);
+    player.socket.join(this.roomName);
 
     this.players.push(player);
     this.updatePlayerList();
@@ -62,16 +58,23 @@ class Room extends SocketObject {
     this.emit('client/broadcast', {
       message: `${player.username} has been kicked.`
     });
-
-    // Figure out later how to actually kick the user.
   }
 
   updatePlayerList() {
-    this.emit('client/updatePlayerList', this.players);
+    this.emit('client/updatePlayerList', this.players.map((p) => p.toJSON()));
   }
 
   emit(key, ...params) {
+    this.host.emit(`room/${key}`, ...params);
     this.io.in(this.roomName).emit(`room/${key}`, ...params);
+  }
+
+  toJSON() {
+    const { players, questions, id } = this;
+    
+    return Object.assign({}, {
+      questions, id, players: players.map((p) => p.toJSON())
+    });
   }
 
   get roomName() {

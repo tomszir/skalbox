@@ -1,20 +1,20 @@
-const ip = require('ip')
-const chalk = require('chalk')
-const merge = require('webpack-merge')
-const common = require('./webpack.common.js')
+const ip = require('ip');
+const chalk = require('chalk');
+const merge = require('webpack-merge');
+const common = require('./webpack.common.js');
 
-const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
+const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 
-const port = 8080
+const port = 8080;
 
 const messages = [
   'Your application is running at ' + chalk.cyan('http://localhost:' + port),
   'To access a local version use  ' + chalk.cyan('http://' + ip.address() + ':' + port)
-]
+];
 
 const notes = [
   'To create a production build run ' + chalk.cyan('yarn build')
-]
+];
 
 module.exports = merge(common, {
   mode: 'development',
@@ -36,4 +36,4 @@ module.exports = merge(common, {
       }
     })
   ]
-})
+});

@@ -5,18 +5,22 @@
         <div class="text--title">
           Skalbox
         </div>
-        
+
         <Input
+          @input="onRoomIdChange"
           v-model="roomId"
           placeholder="Enter PIN"
           :max-length="4"
         />
 
-        <Message v-if="error" type="danger">
-          {{ error.message }}
-        </Message>
+        <Input
+          v-if="roomIsFound"
+          v-model="username"
+          placeholder="Enter your username"
+          :max-length="100"
+        />
         
-        <Button @click="joinRoom">
+        <Button @click="joinRoom" :type="username.length > 0 ? 'success' : ''" :disabled="!roomIsFound">
           Join
         </Button>
 
@@ -28,7 +32,7 @@
               here
             </a>
 
-            to create a new room
+            to create a new room 
           </p>
         </div>
       </div>
@@ -38,7 +42,7 @@
         Made by 
         <a href="#" class="link">Toms Zvirbulis</a>, 
         <a href="#" class="link">Juris Ozoliņš</a>, 
-        <a href="#" class="link">Jānis Skalbe</a>
+        <a href="#" class="link">Jānis Straume</a>
       </p>
     </div>
   </div>
@@ -46,9 +50,10 @@
 
 <script>
 import axios from 'axios';
+import { mapState } from 'vuex';
 
-import Input from '@/components/Input';
-import Button from '@/components/Button';
+import Input from '@/components/forms/Input';
+import Button from '@/components/forms/Button';
 import Message from '@/components/Message';
 
 // TODO list:
@@ -57,42 +62,61 @@ import Message from '@/components/Message';
 export default {
   name: 'HomePage',
   components: { Input, Button, Message },
+  computed: {
+    ...mapState([
+      'socket',
+      'baseURL'
+    ])
+  },
   data() {
     return {
       roomId: '',
-      error: false
+      username: '',
+      roomIsFound: false
     }
   },
   methods: {
     async joinRoom() {
+      const { roomId, username } = this;
+      
+      if (username.length > 0) {
+        socket.emit('room/join', { roomId, username });
+        
+        const room = await axios.get(`${baseURL}/room/get/${roomId}`)
+          .then((r) => r.data.room)
+          .catch(console.error);
 
+        this.$store.commit('setRoom', room);
+        this.$store.commit('setPlayer', {
+          username,
+          id: socket.id
+        });
+        this.$router.push({ path: `/room/${roomId}` });
+      }
     },
 
     async onRoomIdChange(v) {
       if (v.length === 0) {
-        this.error = null
-      
+        this.roomIsFound = false;
         return;
       }
 
       if (v.length < 4) {
-        this.error = {
-          message: 'The room PIN must be atleast 4 characters long.'
-        }
-
+        this.roomIsFound = false;
         return;
       }
 
       try {
-        await axios.get(`http://localhost:8081/rooms/get/${v}`);
+        await axios.get(`${baseURL}/room/get/${v}`);
         
-        this.error = null;
+        this.roomIsFound = true;
       } catch(err) {
-        this.error = {
-          message: 'Could not find the specified room.'
-        };
+        this.roomIsFound = false;
       }
     }
+  },
+  mounted() {
+    this.$store.dispatch('connectToSocket');
   }
 }
 </script>

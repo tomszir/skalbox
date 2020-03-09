@@ -4,7 +4,7 @@ class SocketObject {
   }
 
   getSocket(id) {
-    return this.io.sockets.sockets.get(id);
+    // return this.io.sockets.sockets.get(id);
   }
 }
 
